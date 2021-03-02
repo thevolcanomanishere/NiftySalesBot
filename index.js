@@ -171,7 +171,7 @@ const createChannelText = (project_name, name, SaleAmount, priceChangeFactor, pr
 }
 
 const createTwitterText1 = (project_name, name, SaleAmount, priceChangeFactor, profit, niftyPrice) => {
-  return `Project: ${project_name}\nName: ${name}\n$${niftyPrice} -> $${SaleAmount}\nChange Factor:🚀 ${priceChangeFactor}x\nProfit: $${profit}\n@niftygateway`
+  return `Project: ${project_name}\nName: ${name}\n$${niftyPrice} -> $${SaleAmount}\nChange Factor:🚀 ${priceChangeFactor}x\nProfit: $${profit}`
 }
 
 const createTwitterText2 = (tokenId, contractAddress) => {
