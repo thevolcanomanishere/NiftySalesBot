@@ -1,4 +1,4 @@
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-core');
 const TeleBot = require('telebot');
 const MongoClient = require('mongodb').MongoClient;
 const Twitter = require("twitter-lite");
@@ -299,7 +299,7 @@ const justTheBestBits = (object) => {
     profileCollection = client.db("NiftyGateway").collection("profiles");
     watchlistCollection = client.db("NiftyGateway").collection("watchlist");
     await updateWatchList();
-    const browser = await puppeteer.launch()
+    const browser = await puppeteer.launch({executablePath: '/usr/bin/chromium-browser'});
     try {
         const page = await browser.newPage()
         await page.on('response', async response => {
