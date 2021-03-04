@@ -213,12 +213,28 @@ const checkWatchList = (niftyObjects) => {
   });
 }
 
+const processListing = (NiftyObject) => {
+  const { ListingAmountInCents } = NiftyObject;
+  const { contractAddress, project_name, name, tokenId} = NiftyObject.NiftyObject;
+  const { Timestamp } = NiftyObject.NiftyObject.unmintedNiftyObjThatCreatedThis;
+  const { niftyTotalSold, niftyPriceInCents } = NiftyObject.NiftyObject.unmintedNiftyObjThatCreatedThis;
+
+  if(ListingAmountInCents < niftyPriceInCents){
+    const percentBelowSale = ((niftyPriceInCents / ListingAmountInCents) * 100) - 100;
+    const listingPrice = convertToFiat(ListingAmountInCents);
+    const salePrice = convertToFiat(niftyPriceInCents);
+    const text = `Project: ${project_name}\nName: ${name}\nDate Listed: ${new Date(Timestamp)}\n${salePrice} -> ${listingPrice}\nDiff: ${percentBelowSale}`
+    sendTelegram(adminTelegramId, text)
+  }
+}
+
 
 const justTheBestBits = (object) => {
   switch (object.Type) {
     case "offer":
       return;
     case "listing":
+      processListing(NiftyObject)
       return;
     case "sale":
       break;
