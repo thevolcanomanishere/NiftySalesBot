@@ -381,9 +381,12 @@ const justTheBestBits = (object) => {
                  if(item.ListingAmountInCents < item.niftyPriceInCents) return item;
                 }) ;
 
+                console.log("Current: ", removedNormalListings.map(item => item.id));
+
                 previousTickArray = removedNormalListings.map(item => item.id);
 
                 if(removedNormalListings.length === 0) return;
+                
                 let result = await collection.insertMany(removedNormalListings);
                 checkWatchList(removedNormalListings);
                 checkListings(removedNormalListings);
