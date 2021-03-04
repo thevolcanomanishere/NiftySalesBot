@@ -209,7 +209,7 @@ const checkWatchList = (niftyObjects) => {
     matches.forEach(match => {
       const text = createUpdateText(watchList[match].profileName, niftyObject.project_name, niftyObject.name, niftyObject.SaleAmount, niftyObject.priceChangeFactor, niftyObject.profit, niftyObject.niftyPrice)
       console.log(text);
-    sendTelegram(watchList[match].teleId, text);
+      sendTelegram(watchList[match].teleId, text);
     })
   });
 }
@@ -235,6 +235,7 @@ const processListing = (NiftyObject) => {
 
   return {
     Type: "listing",
+    id,
     ListingAmountInCents,
     contractAddress,
     project_name,
@@ -243,14 +244,6 @@ const processListing = (NiftyObject) => {
     Timestamp,
     niftyTotalSold, 
     niftyPriceInCents
-  }
-
-  if(ListingAmountInCents < niftyPriceInCents){
-    const percentBelowSale = ((niftyPriceInCents / ListingAmountInCents) * 100) - 100;
-    const listingPrice = convertToFiat(ListingAmountInCents);
-    const salePrice = convertToFiat(niftyPriceInCents);
-    const text = `Project: ${project_name}\nName: ${name}\nDate Listed: ${new Date(Timestamp)}\n${salePrice} -> ${listingPrice}\nDiff: ${percentBelowSale}`
-    sendTelegram(adminTelegramId, text)
   }
 }
 
