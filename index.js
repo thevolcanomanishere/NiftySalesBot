@@ -375,13 +375,19 @@ const justTheBestBits = (object) => {
                   removedDupes = formattedShrunk.filter(item => {
                     return !previousTickArray.includes(item.id);
                   }).filter(item => item !== undefined);
-                  previousTickArray = formattedShrunk.map(item => item.id);
                 }
-                if(removedDupes.length === 0) return;
-                let result = await collection.insertMany(removedDupes);
-                checkWatchList(removedDupes);
-                checkListings(removedDupes);
-                console.log("New added: ", removedDupes.map(item => item.id));
+                const removedNormalListings = removeDupes.map(item => {
+                 if(item.Type === "sale") return item;
+                 if(item.ListingAmountInCents < item.niftyPriceInCents) return item;
+                }) ;
+
+                previousTickArray = removedNormalListings.map(item => item.id);
+
+                if(removedNormalListings.length === 0) return;
+                let result = await collection.insertMany(removedNormalListings);
+                checkWatchList(removedNormalListings);
+                checkListings(removedNormalListings);
+                console.log("New added: ", removedNormalListings.map(item => item.id));
                 console.log("New filter list :", previousTickArray);
                 console.log("-------")
             }
