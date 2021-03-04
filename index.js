@@ -234,7 +234,7 @@ const justTheBestBits = (object) => {
     case "offer":
       return;
     case "listing":
-      processListing(NiftyObject)
+      processListing(object)
       return;
     case "sale":
       break;
