@@ -188,7 +188,7 @@ const checkWatchList = (niftyObjects) => {
     const twitterText1 = createTwitterText1(niftyObject.project_name, niftyObject.name, niftyObject.SaleAmount, niftyObject.priceChangeFactor, niftyObject.profit, niftyObject.niftyPrice);
     const twitterText2 = createTwitterText2(niftyObject.tokenId, niftyObject.contractAddress);
     if(niftyObject.priceChangeFactor >= 2){
-      tweet(twitterText1, twitterText2);
+      // tweet(twitterText1, twitterText2);
     }
     sendTelegram(channelId, channelText);
     let matches = [];
@@ -215,15 +215,20 @@ const checkWatchList = (niftyObjects) => {
 }
 
 const checkListings = (NiftyObjects) => {
-  NiftyObjects.forEach(nifty => {
+  NiftyObjects.forEach( async nifty => {
     if(nifty.Type === "sale") return;
     const { ListingAmountInCents, niftyPriceInCents, project_name, name, Timestamp } = nifty;
     if(ListingAmountInCents < niftyPriceInCents){
-      const percentBelowSale = ((niftyPriceInCents / ListingAmountInCents) * 100) - 100;
+      const percentBelowSale = Math.round(((niftyPriceInCents / ListingAmountInCents) * 100 * -1) - 100);
+      if(percentBelowSale < 10) return;
       const listingPrice = convertToFiat(ListingAmountInCents);
       const salePrice = convertToFiat(niftyPriceInCents);
-      const text = `Project: ${project_name}\nName: ${name}\nDate Listed: ${new Date(Timestamp)}\n${salePrice} -> ${listingPrice}\nDiff: ${percentBelowSale}`
-      sendTelegram(adminTelegramId, text)
+      const date = new Date(Timestamp);
+      const dateFormatted = `${date.getDay()}/${date.getMonth()}/${date.getFullYear()}`;
+      const longUrl = `https://niftygateway.com/itemdetail/secondary/${nifty.contractAddress}/${nifty.tokenId}`;
+      const { data : shortUrl } = await axios.get(`https://tinyurl.com/api-create.php?url=${longUrl}`);
+      const text = `Project: ${project_name}\nName: ${name}\nDate Listed: ${dateFormatted}\n$${salePrice} -> $${listingPrice}\nURL: ${shortUrl}\nDiff: -${percentBelowSale}%`;
+      sendTelegram(adminTelegramId, text);
     }
   })
 }
@@ -234,17 +239,19 @@ const processListing = (NiftyObject) => {
   const { Timestamp } = NiftyObject.NiftyObject.unmintedNiftyObjThatCreatedThis;
   const { niftyTotalSold, niftyPriceInCents } = NiftyObject.NiftyObject.unmintedNiftyObjThatCreatedThis;
 
-  return {
-    Type: "listing",
-    id,
-    ListingAmountInCents,
-    contractAddress,
-    project_name,
-    name,
-    tokenId,
-    Timestamp,
-    niftyTotalSold, 
-    niftyPriceInCents
+  if(ListingAmountInCents < niftyPriceInCents){
+    return {
+      Type: "listing",
+      id,
+      ListingAmountInCents,
+      contractAddress,
+      project_name,
+      name,
+      tokenId,
+      Timestamp,
+      niftyTotalSold, 
+      niftyPriceInCents
+    }
   }
 }
 
@@ -361,7 +368,6 @@ const justTheBestBits = (object) => {
                 }
 
                 console.log("Previous: ", previousTickArray);
-                console.log("Current: ", formattedShrunk.map(item => item.id));
 
                 let removeDupes = [];
                 //First run
@@ -372,25 +378,20 @@ const justTheBestBits = (object) => {
                   return;
                 } else {
                   //Second run
-                  removedDupes = formattedShrunk.filter(item => {
+                  removeDupes = formattedShrunk.filter(item => {
                     return !previousTickArray.includes(item.id);
                   }).filter(item => item !== undefined);
                 }
-                const removedNormalListings = removeDupes.map(item => {
-                 if(item.Type === "sale") return item;
-                 if(item.ListingAmountInCents < item.niftyPriceInCents) return item;
-                }) ;
+                console.log("Current: ", removeDupes.map(item => item.id));
 
-                console.log("Current: ", removedNormalListings.map(item => item.id));
+                if(removeDupes.length === 0) return;
 
-                previousTickArray = removedNormalListings.map(item => item.id);
+                previousTickArray = formattedShrunk.map(item => item.id);
 
-                if(removedNormalListings.length === 0) return;
-                
-                let result = await collection.insertMany(removedNormalListings);
-                checkWatchList(removedNormalListings);
-                checkListings(removedNormalListings);
-                console.log("New added: ", removedNormalListings.map(item => item.id));
+                let result = await collection.insertMany(removeDupes);
+                checkWatchList(removeDupes);
+                await checkListings(removeDupes);
+                console.log("New added: ", removeDupes.map(item => item.id));
                 console.log("New filter list :", previousTickArray);
                 console.log("-------")
             }
