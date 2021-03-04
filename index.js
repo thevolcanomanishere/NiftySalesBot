@@ -217,6 +217,7 @@ const checkWatchList = (niftyObjects) => {
 const checkListings = (NiftyObjects) => {
   NiftyObjects.forEach(nifty => {
     if(nifty.Type === "sale") return;
+    const { ListingAmountInCents, niftyPriceInCents, project_name, name, Timestamp } = nifty;
     if(ListingAmountInCents < niftyPriceInCents){
       const percentBelowSale = ((niftyPriceInCents / ListingAmountInCents) * 100) - 100;
       const listingPrice = convertToFiat(ListingAmountInCents);
@@ -334,7 +335,13 @@ const justTheBestBits = (object) => {
     profileCollection = client.db("NiftyGateway").collection("profiles");
     watchlistCollection = client.db("NiftyGateway").collection("watchlist");
     await updateWatchList();
-    const browser = await puppeteer.launch({executablePath: '/usr/bin/chromium-browser'});
+
+    let browser;
+    if(process.arch === "arm"){
+      browser = await puppeteer.launch({executablePath: '/usr/bin/chromium-browser'});
+    } else {
+      browser = await puppeteer.launch({ executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'});
+    }
     try {
         const page = await browser.newPage()
         await page.on('response', async response => {
