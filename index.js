@@ -182,6 +182,7 @@ const createTwitterText2 = (tokenId, contractAddress) => {
  
 const checkWatchList = (niftyObjects) => {
   niftyObjects.forEach(niftyObject => {
+    if(niftyObject.Type === "listing") return;
     // send messages to all channel
     const channelText = createChannelText(niftyObject.project_name, niftyObject.name, niftyObject.SaleAmount, niftyObject.priceChangeFactor, niftyObject.profit, niftyObject.niftyPrice);
     const twitterText1 = createTwitterText1(niftyObject.project_name, niftyObject.name, niftyObject.SaleAmount, niftyObject.priceChangeFactor, niftyObject.profit, niftyObject.niftyPrice);
@@ -213,11 +214,36 @@ const checkWatchList = (niftyObjects) => {
   });
 }
 
+const checkListings = (NiftyObjects) => {
+  NiftyObjects.forEach(nifty => {
+    if(nifty.Type === "sale") return;
+    if(ListingAmountInCents < niftyPriceInCents){
+      const percentBelowSale = ((niftyPriceInCents / ListingAmountInCents) * 100) - 100;
+      const listingPrice = convertToFiat(ListingAmountInCents);
+      const salePrice = convertToFiat(niftyPriceInCents);
+      const text = `Project: ${project_name}\nName: ${name}\nDate Listed: ${new Date(Timestamp)}\n${salePrice} -> ${listingPrice}\nDiff: ${percentBelowSale}`
+      sendTelegram(adminTelegramId, text)
+    }
+  })
+}
+
 const processListing = (NiftyObject) => {
   const { ListingAmountInCents } = NiftyObject;
-  const { contractAddress, project_name, name, tokenId} = NiftyObject.NiftyObject;
+  const { contractAddress, project_name, name, tokenId, id} = NiftyObject.NiftyObject;
   const { Timestamp } = NiftyObject.NiftyObject.unmintedNiftyObjThatCreatedThis;
   const { niftyTotalSold, niftyPriceInCents } = NiftyObject.NiftyObject.unmintedNiftyObjThatCreatedThis;
+
+  return {
+    Type: "listing",
+    ListingAmountInCents,
+    contractAddress,
+    project_name,
+    name,
+    tokenId,
+    Timestamp,
+    niftyTotalSold, 
+    niftyPriceInCents
+  }
 
   if(ListingAmountInCents < niftyPriceInCents){
     const percentBelowSale = ((niftyPriceInCents / ListingAmountInCents) * 100) - 100;
@@ -271,6 +297,7 @@ const justTheBestBits = (object) => {
      return;
    }
    return {
+     Type: "sale",
      Timestamp : new Date(Timestamp),
      identifier,
      whenListed,
@@ -354,6 +381,7 @@ const justTheBestBits = (object) => {
                 if(removedDupes.length === 0) return;
                 let result = await collection.insertMany(removedDupes);
                 checkWatchList(removedDupes);
+                checkListings(removedDupes);
                 console.log("New added: ", removedDupes.map(item => item.id));
                 console.log("New filter list :", previousTickArray);
                 console.log("-------")
