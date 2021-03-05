@@ -239,6 +239,8 @@ const processListing = (NiftyObject) => {
   const { Timestamp } = NiftyObject.NiftyObject.unmintedNiftyObjThatCreatedThis;
   const { niftyTotalSold, niftyPriceInCents } = NiftyObject.NiftyObject.unmintedNiftyObjThatCreatedThis;
 
+  const date = new Date(Timestamp);
+
   if(ListingAmountInCents < niftyPriceInCents){
     return {
       Type: "listing",
@@ -248,7 +250,7 @@ const processListing = (NiftyObject) => {
       project_name,
       name,
       tokenId,
-      Timestamp,
+      Timestamp: date,
       niftyTotalSold, 
       niftyPriceInCents
     }
