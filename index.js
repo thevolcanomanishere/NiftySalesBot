@@ -295,7 +295,7 @@ const justTheBestBits = (object) => {
       SaleAmountInCents} = object;
    const { contractAddress, project_name, project_slug, name, tokenId} = object.NiftyObject;
    const { template } = object.NiftyObject.unmintedNiftyObjThatCreatedThis.contractObj;
-   const { niftyTotalNumOfEditions, niftyTotalSold, niftyPriceInCents} = object.NiftyObject.unmintedNiftyObjThatCreatedThis;
+   const { niftyTotalNumOfEditions, niftyTotalSold, niftyPriceInCents, niftyType} = object.NiftyObject.unmintedNiftyObjThatCreatedThis;
    const whenListed = new Date(object.NiftyObject.unmintedNiftyObjThatCreatedThis.Timestamp);
    const priceChangeFactor = Math.round(SaleAmountInCents / niftyPriceInCents * 100) / 100;
    
@@ -328,6 +328,7 @@ const justTheBestBits = (object) => {
      niftyTotalNumOfEditions,
      niftyTotalSold,
      niftyPrice,
+     niftyType,
      priceChangeFactor,
      profit
    }
