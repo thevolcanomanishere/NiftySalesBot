@@ -55,7 +55,7 @@ const createIdentifier = (contractAddress, niftyTotalSold, niftyPrice) => `${con
 
 const createShortUrlForNifty = async (contractAddress, tokenId) => {
   try {
-    const longUrl = `https://niftygateway.com/itemdetail/secondary/${nifty.contractAddress}/${nifty.tokenId}`;
+    const longUrl = `https://niftygateway.com/itemdetail/secondary/${contractAddress}/${tokenId}`;
     const { data : shortUrl } = await axios.get(`https://tinyurl.com/api-create.php?url=${longUrl}`);
     return shortUrl;
   } catch (error) {
