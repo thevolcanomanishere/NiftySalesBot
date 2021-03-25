@@ -53,7 +53,7 @@ const getNiftyProfile = async (profileName) => {
 
 const createIdentifier = (contractAddress, niftyTotalSold, niftyPrice) => `${contractAddress}${niftyTotalSold}${niftyPrice}`;
 
-const createShortUrlForNifty = (contractAddress, tokenId) => {
+const createShortUrlForNifty = async (contractAddress, tokenId) => {
   try {
     const longUrl = `https://niftygateway.com/itemdetail/secondary/${nifty.contractAddress}/${nifty.tokenId}`;
     const { data : shortUrl } = await axios.get(`https://tinyurl.com/api-create.php?url=${longUrl}`);
@@ -190,10 +190,10 @@ const createTwitterText2 = (tokenId, contractAddress) => {
 
  
 const checkWatchList = (niftyObjects) => {
-  niftyObjects.forEach(niftyObject => {
+  niftyObjects.forEach(async (niftyObject) => {
     if(niftyObject.Type === "listing") return;
     // send messages to all channel
-    const shortUrl = createShortUrlForNifty(niftyObject.contractAddress, niftyObject.tokenId);
+    const shortUrl = await createShortUrlForNifty(niftyObject.contractAddress, niftyObject.tokenId);
     const channelText = createChannelText(niftyObject.project_name, niftyObject.name, niftyObject.SaleAmount, niftyObject.priceChangeFactor, niftyObject.profit, niftyObject.niftyPrice, shortUrl);
     const twitterText1 = createTwitterText1(niftyObject.project_name, niftyObject.name, niftyObject.SaleAmount, niftyObject.priceChangeFactor, niftyObject.profit, niftyObject.niftyPrice);
     const twitterText2 = createTwitterText2(niftyObject.tokenId, niftyObject.contractAddress);
