@@ -43,8 +43,6 @@ const sendTelegram = (id, text) => {
 
 const convertToFiat = (cents) => cents / 100;
 
-let subscriptions = [];
-
 let profileCollection;
 let watchlistCollection;
 
@@ -56,6 +54,7 @@ const getNiftyProfile = async (profileName) => {
 const createIdentifier = (contractAddress, niftyTotalSold, niftyPrice) => `${contractAddress}${niftyTotalSold}${niftyPrice}`;
 
 let watchList = [];
+
 
 const updateWatchList = async() => {
   const profiles = await profileCollection.find().toArray();
@@ -154,7 +153,7 @@ bot.on(/^\/unsub (.+)$/, async (msg, props) => {
 });
 
 
-sendTelegram(879556888, 'Server Up');
+sendTelegram(adminTelegramId, 'Server Up');
 
 let previousTickArray = [];
 
@@ -178,7 +177,7 @@ const createTwitterText2 = (tokenId, contractAddress) => {
   const url = `https://niftygateway.com/itemdetail/secondary/${contractAddress}/${tokenId}`
   return `Link: ${url}`
 }
- 
+
  
 const checkWatchList = (niftyObjects) => {
   niftyObjects.forEach(niftyObject => {
@@ -194,7 +193,7 @@ const checkWatchList = (niftyObjects) => {
     let matches = [];
     const identifierNifty = createIdentifier(niftyObject.contractAddress, niftyObject.niftyTotalSold, niftyObject.niftyPrice);
     watchList.map((watch, index) => {
-      const identifierWatch = createIdentifier(watch.contractAddress, watch.niftyTotalSold, watch.niftyPrice);
+      const identifierWatch = watch.identifier;
       if(identifierNifty === identifierWatch){
         const { SaleAmount } = niftyObject;
         matches.push(index);
@@ -275,7 +274,7 @@ const justTheBestBits = (object) => {
     case "bid":
       return;
     default:
-      sendTelegram(879556888, object.Type)
+      sendTelegram(adminTelegramId, object.Type)
       return;
   }
 
@@ -322,7 +321,7 @@ const justTheBestBits = (object) => {
    }
   } catch (error) {
     sendTelegram(error);
-    sendTelegram(879556888,`Nifty Name: ${object.NiftyObject.name}\nType: ${object.Type}`)
+    sendTelegram(adminTelegramId,`Nifty Name: ${object.NiftyObject.name}\nType: ${object.Type}`)
     return;
   }
 }
@@ -331,8 +330,8 @@ const justTheBestBits = (object) => {
 (async () => {
     const client = await MongoClient.connect(uri, { useNewUrlParser: true })
         .catch(err => { 
-          sendTelegram(879556888, "Database connection error");
-          sendTelegram(879556888, err)
+          sendTelegram(adminTelegramId, "Database connection error");
+          sendTelegram(adminTelegramId, err)
           console.log(err); 
         });
 
@@ -376,7 +375,7 @@ const justTheBestBits = (object) => {
                 if(previousTickArray.length === 0){
                   previousTickArray = formattedShrunk.map(item => item.id);
                   let result = await collection.insertMany(formattedShrunk);
-                  sendTelegram(879556888, `Inserted ${result.insertedCount}`);
+                  sendTelegram(adminTelegramId, `Inserted ${result.insertedCount}`);
                   return;
                 } else {
                   //Second run
