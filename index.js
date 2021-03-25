@@ -171,8 +171,8 @@ const getEditionNumber = name => {
   return name.substring(name.indexOf("#") + 1, name.indexOf("/"));
 }
 
-const createUpdateText = (profileName, project_name, name, SaleAmount, priceChangeFactor, profit, niftyPrice) => {
-  return `Profile: ${profileName}\nProject: ${project_name}\nName: ${name}\n$${niftyPrice} -> $${SaleAmount}\nChange Factor:🚀 ${priceChangeFactor}x\nProfit: $${profit}`
+const createUpdateText = (profileName, project_name, name, SaleAmount, priceChangeFactor, profit, niftyPrice, shortUrl) => {
+  return `Profile: ${profileName}\nProject: ${project_name}\nName: ${name}\n$${niftyPrice} -> $${SaleAmount}\nChange Factor:🚀 ${priceChangeFactor}x\nURL: ${shortUrl}\nProfit: $${profit}`
 }
 
 const createChannelText = (project_name, name, SaleAmount, priceChangeFactor, profit, niftyPrice, shortUrl) => {
@@ -216,8 +216,9 @@ const checkWatchList = (niftyObjects) => {
       return watch;
     });
 
-    matches.forEach(match => {
-      const text = createUpdateText(watchList[match].profileName, niftyObject.project_name, niftyObject.name, niftyObject.SaleAmount, niftyObject.priceChangeFactor, niftyObject.profit, niftyObject.niftyPrice)
+    matches.forEach(async (match) => {
+      const shortUrl = await createShortUrlForNifty(niftyObject.contractAddress, niftyObject.tokenId);
+      const text = createUpdateText(watchList[match].profileName, niftyObject.project_name, niftyObject.name, niftyObject.SaleAmount, niftyObject.priceChangeFactor, niftyObject.profit, niftyObject.niftyPrice, shortUrl)
       console.log(text);
       sendTelegram(watchList[match].teleId, text);
     })
