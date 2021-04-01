@@ -18,10 +18,9 @@ const client = new Twitter({
 });
 
 const tweet = async (message1, message2) => {
-  const tweet1 = await client.post('statuses/update', { status: message1 }).catch(console.error);
-
-  const lastTweetID = tweet1.id_str;
-  await client.post('statuses/update', { status: message2, in_reply_to_status_id: lastTweetID }).catch(console.error);
+  await client.post('statuses/update', { status: message1 }).catch(console.error);
+  // const lastTweetID = tweet1.id_str;
+  // await client.post('statuses/update', { status: message2, in_reply_to_status_id: lastTweetID }).catch(console.error);
 }
 
 bot.on('text', (msg) => {
@@ -179,13 +178,13 @@ const createChannelText = (project_name, name, SaleAmount, priceChangeFactor, pr
   return `Project: ${project_name}\nName: ${name}\n$${niftyPrice} -> $${SaleAmount}\nChange Factor:🚀 ${priceChangeFactor}x\nURL: ${shortUrl}\nProfit: $${profit}`
 }
 
-const createTwitterText1 = (project_name, name, SaleAmount, priceChangeFactor, profit, niftyPrice) => {
-  return `Project: ${project_name}\nName: ${name}\n$${niftyPrice} -> $${SaleAmount}\nChange Factor:🚀 ${priceChangeFactor}x\nProfit: $${profit}`
+const createTwitterText1 = (project_name, name, SaleAmount, priceChangeFactor, profit, niftyPrice, url) => {
+  return `Project: ${project_name}\nName: ${name}\n$${niftyPrice} -> $${SaleAmount}\nChange Factor:🚀 ${priceChangeFactor}x\nProfit: $${profit}\nLink: ${url}`;
 }
 
-const createTwitterText2 = (tokenId, contractAddress) => {
+const createTwitterNiftyUrl = (tokenId, contractAddress) => {
   const url = `https://niftygateway.com/itemdetail/secondary/${contractAddress}/${tokenId}`
-  return `Link: ${url}`
+  return url;
 }
 
  
@@ -196,9 +195,9 @@ const checkWatchList = (niftyObjects) => {
     const shortUrl = await createShortUrlForNifty(niftyObject.contractAddress, niftyObject.tokenId);
     const channelText = createChannelText(niftyObject.project_name, niftyObject.name, niftyObject.SaleAmount, niftyObject.priceChangeFactor, niftyObject.profit, niftyObject.niftyPrice, shortUrl);
     const twitterText1 = createTwitterText1(niftyObject.project_name, niftyObject.name, niftyObject.SaleAmount, niftyObject.priceChangeFactor, niftyObject.profit, niftyObject.niftyPrice);
-    const twitterText2 = createTwitterText2(niftyObject.tokenId, niftyObject.contractAddress);
+    const niftyUrl = createTwitterNiftyUrl(niftyObject.tokenId, niftyObject.contractAddress);
     if(niftyObject.priceChangeFactor >= 2){
-      tweet(twitterText1, twitterText2);
+      tweet(twitterText1, niftyUrl);
     }
     sendTelegram(channelId, channelText);
     let matches = [];
