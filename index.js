@@ -194,10 +194,11 @@ const checkWatchList = (niftyObjects) => {
     // send messages to all channel
     const shortUrl = await createShortUrlForNifty(niftyObject.contractAddress, niftyObject.tokenId);
     const channelText = createChannelText(niftyObject.project_name, niftyObject.name, niftyObject.SaleAmount, niftyObject.priceChangeFactor, niftyObject.profit, niftyObject.niftyPrice, shortUrl);
-    const twitterText1 = createTwitterText1(niftyObject.project_name, niftyObject.name, niftyObject.SaleAmount, niftyObject.priceChangeFactor, niftyObject.profit, niftyObject.niftyPrice);
+
     const niftyUrl = createTwitterNiftyUrl(niftyObject.tokenId, niftyObject.contractAddress);
+    const twitterText1 = createTwitterText1(niftyObject.project_name, niftyObject.name, niftyObject.SaleAmount, niftyObject.priceChangeFactor, niftyObject.profit, niftyObject.niftyPrice, niftyUrl);
     if(niftyObject.priceChangeFactor >= 2){
-      tweet(twitterText1, niftyUrl);
+      tweet(twitterText1);
     }
     sendTelegram(channelId, channelText);
     let matches = [];
