@@ -198,7 +198,7 @@ const checkWatchList = (niftyObjects) => {
     const twitterText1 = createTwitterText1(niftyObject.project_name, niftyObject.name, niftyObject.SaleAmount, niftyObject.priceChangeFactor, niftyObject.profit, niftyObject.niftyPrice);
     const twitterText2 = createTwitterText2(niftyObject.tokenId, niftyObject.contractAddress);
     if(niftyObject.priceChangeFactor >= 2){
-      // tweet(twitterText1, twitterText2);
+      tweet(twitterText1, twitterText2);
     }
     sendTelegram(channelId, channelText);
     let matches = [];
