@@ -5,6 +5,7 @@ const Twitter = require("twitter-lite");
 const secrets = require("./secrets.json");
 const axios = require('axios');
 const uri = secrets.mongoURI;
+const config = require('./config');
 const bot = new TeleBot("1644508566:AAEvtoD1SamVrDHGaallta-MGj7UTf8KMT8");
 const adminTelegramId = "879556888";
 const channelId = "-1001342081499";
@@ -197,7 +198,7 @@ const checkWatchList = (niftyObjects) => {
 
     const niftyUrl = createTwitterNiftyUrl(niftyObject.tokenId, niftyObject.contractAddress);
     const twitterText1 = createTwitterText1(niftyObject.project_name, niftyObject.name, niftyObject.SaleAmount, niftyObject.priceChangeFactor, niftyObject.profit, niftyObject.niftyPrice, niftyUrl);
-    if(niftyObject.priceChangeFactor >= 2){
+    if(niftyObject.priceChangeFactor >= config.niftyMultiplierSetting){
       tweet(twitterText1);
     }
     sendTelegram(channelId, channelText);
